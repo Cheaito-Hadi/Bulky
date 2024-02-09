@@ -26,19 +26,28 @@ namespace BulkyWeb.Controllers
         [HttpPost]
         public IActionResult Create(Category obj)
         {
-            _db.Categories.Add(obj);
-            _db.SaveChanges();
-            return RedirectToAction("Index");
+            if (obj.Name != null && obj.Name.Equals("Kira", StringComparison.OrdinalIgnoreCase))
+            {
+                ModelState.AddModelError("Name", "Kira is not allowed");
+            }
+            if (ModelState.IsValid)
+            {
+                _db.Categories.Add(obj);
+                _db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(obj);
+
         }
 
         public IActionResult Delete(int id)
         {
-            var obj = _db.Categories.Find(id);
-            if (obj == null)
+            Category? categoryDb = _db.Categories.Find(id);
+            if (categoryDb == null)
             {
                 return NotFound();
             }
-            _db.Categories.Remove(obj);
+            _db.Categories.Remove(categoryDb);
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
@@ -55,9 +64,13 @@ namespace BulkyWeb.Controllers
         [HttpPost]
         public IActionResult Edit(Category obj)
         {
-            _db.Categories.Update(obj);
-            _db.SaveChanges();
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                _db.Categories.Update(obj);
+                _db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(obj);
         }
     }
 }
